@@ -3,8 +3,7 @@
    [re-frame.core :as re-frame]
    [bookworm-hut-frontend.db :as db]
    [ajax.core :as ajax]
-   [day8.re-frame.http-fx]
-   ))
+   [day8.re-frame.http-fx]))
 
 (re-frame/reg-event-db
  ::initialize-db

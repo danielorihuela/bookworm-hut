@@ -4,9 +4,7 @@
    [re-frame.core :as re-frame]
    [bookworm-hut-frontend.events :as events]
    [bookworm-hut-frontend.views :as views]
-   [bookworm-hut-frontend.config :as config]
-   ))
-
+   [bookworm-hut-frontend.config :as config]))
 
 (defn dev-setup []
   (when config/debug?

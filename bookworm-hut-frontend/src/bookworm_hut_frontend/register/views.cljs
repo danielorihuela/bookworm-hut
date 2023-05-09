@@ -1,33 +1,41 @@
 (ns bookworm-hut-frontend.register.views
   (:require
    [reagent.core :as reagent]
-   [re-frame.core :as re-frame]))
+   [re-frame.core :as re-frame]
+   [clojure.spec.alpha :as spec]
+   [bookworm-hut-frontend.components.username-form-field.views :refer [username-form-field]]
+   [bookworm-hut-frontend.components.password-form-field.views :refer [password-form-field]]))
 
-(defn username-field []
-  [:div.field
-   [:p.control.has-icons-left
-    [:input.input {:type "text" :placeholder "Username"}]
-    [:span.icon.is-small.is-left
-     [:i.fas.fa-user]]]])
+(spec/def ::username (spec/and string? #(< 2 (count %))))
+(defn username-valid? [username]
+  (spec/valid? ::username username))
 
-(defn password-field []
-  (let [show-password? (reagent/atom false)]
-    (fn []
-      [:div.field
-       [:p.control.has-icons-left.has-icons-right
-        [:input.input {:type (if @show-password? "text" "password") :placeholder "Password"}]
-        [:span.icon.is-small.is-left
-         [:i.fas.fa-lock]]
-        [:span.icon.is-small.is-right
-         [(if @show-password?
-            :i.fas.fa-eye-slash
-            :i.fas.fa-eye)
-          {:style
-           {:pointer-events "initial"}
-           :on-click #(reset! show-password? (not @show-password?))}]]]])))
+(spec/def ::password (spec/and string? #(< 15 (count %))))
+(defn password-valid? [password]
+  (spec/valid? ::password password))
+
+(defn submit-button [username-filled? password-filled?]
+  [:input.button.is-primary
+   {:type "submit"
+    :value "Register"
+    :style {:align-self "center"}
+    :disabled (when (or (not @username-filled?) (not @password-filled?)) true)}])
 
 (defn register-panel []
-  [:form
-   [username-field]
-   [password-field]
-   [:input.button.is-primary {:type "submit" :value "Register"}]])
+  (let [username-filled? (reagent/atom false)
+        password-filled? (reagent/atom false)]
+    (fn []
+      [:form {:style {:display "flex" :flex-direction "column"}
+              :action "http://localhost:3000/register"
+              :method "post"}
+       [username-form-field
+        "Username"
+        "Minimum length is 3"
+        username-valid?
+        username-filled?]
+       [password-form-field
+        "Password"
+        "Minimum length is 16"
+        password-valid?
+        password-filled?]
+       [submit-button username-filled? password-filled?]])))
