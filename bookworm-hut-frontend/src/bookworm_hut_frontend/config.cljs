@@ -1,4 +1,5 @@
 (ns bookworm-hut-frontend.config)
 
-(def debug?
-  ^boolean goog.DEBUG)
+(goog-define url "")
+
+

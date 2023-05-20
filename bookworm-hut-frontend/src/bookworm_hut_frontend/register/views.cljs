@@ -4,7 +4,9 @@
    [re-frame.core :as re-frame]
    [clojure.spec.alpha :as spec]
    [bookworm-hut-frontend.components.username-form-field.views :refer [username-form-field]]
-   [bookworm-hut-frontend.components.password-form-field.views :refer [password-form-field]]))
+   [bookworm-hut-frontend.components.password-form-field.views :refer [password-form-field]]
+   [bookworm-hut-frontend.config :as config]
+   ))
 
 (spec/def ::username (spec/and string? #(< 2 (count %))))
 (defn username-valid? [username]
@@ -26,7 +28,7 @@
         password-filled? (reagent/atom false)]
     (fn []
       [:form {:style {:display "flex" :flex-direction "column"}
-              :action "http://localhost:3000/register"
+              :action (str config/url "/register")
               :method "post"}
        [username-form-field
         "Username"
