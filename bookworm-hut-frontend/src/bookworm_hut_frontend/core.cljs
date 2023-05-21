@@ -4,7 +4,8 @@
    [re-frame.core :as re-frame]
    [bookworm-hut-frontend.events :as events]
    [bookworm-hut-frontend.views :as views]
-   [bookworm-hut-frontend.config :as config]))
+   [bookworm-hut-frontend.config :as config]
+   [bookworm-hut-frontend.routes :as routes]))
 
 (defn ^:dev/after-load mount-root []
   (re-frame/clear-subscription-cache!)
@@ -13,5 +14,6 @@
     (rdom/render [views/main-panel] root-el)))
 
 (defn init []
+  (routes/start!)
   (re-frame/dispatch-sync [::events/initialize-db])
   (mount-root))

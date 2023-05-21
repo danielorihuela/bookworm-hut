@@ -12,7 +12,8 @@
   [day8.re-frame/http-fx "0.2.4"]
   [cljs-ajax "0.8.4"]
   [binaryage/devtools "1.0.6"]
-  [org.clojure/clojure "1.11.1"]]
+  [bidi "2.1.6"]
+  [kibu/pushy "0.3.8"]]
 
  :dev-http
  {8280 "resources/public"}
