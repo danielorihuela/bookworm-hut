@@ -6,7 +6,7 @@
    [bookworm-hut-frontend.components.username-form-field.views :refer [username-form-field]]
    [bookworm-hut-frontend.components.password-form-field.views :refer [password-form-field]]
    [bookworm-hut-frontend.config :as config]
-   ))
+   [bookworm-hut-frontend.register.events :as events]))
 
 (spec/def ::username (spec/and string? #(< 2 (count %))))
 (defn username-valid? [username]
@@ -21,15 +21,18 @@
    {:type "submit"
     :value "Register"
     :style {:align-self "center"}
-    :disabled (when (or (not @username-filled?) (not @password-filled?)) true)}])
+    :disabled (when (or (not @username-filled?) (not @password-filled?)) true)
+    :on-click #(re-frame/dispatch [::events/register "some username" "some password"])
+    }])
 
-(defn register-panel []
+(defn register-form []
   (let [username-filled? (reagent/atom false)
         password-filled? (reagent/atom false)]
     (fn []
-      [:form {:style {:display "flex" :flex-direction "column"}
-              :action (str config/url "/register")
-              :method "post"}
+      [:div
+       {:style {:display "flex" :flex-direction "column"}
+        :action (str config/url "/register")
+        :method "post"}
        [username-form-field
         "Username"
         "Minimum length is 3"

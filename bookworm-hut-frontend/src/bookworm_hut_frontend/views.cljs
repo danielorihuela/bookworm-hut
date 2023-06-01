@@ -25,7 +25,7 @@
     [:label {:style {:font-size "2.5em"}} "Bookworm Hut"]
     [:img {:src "logo.png" :width 150 :height 150}]]
    [:div {:style {:flex-grow 2}}
-    [bookworm-hut-frontend.register.views/register-panel]]])
+    [bookworm-hut-frontend.register.views/register-form]]])
 
 (defmethod routes/panels :register-panel [] [register-panel])
 
