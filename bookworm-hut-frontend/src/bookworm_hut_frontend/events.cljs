@@ -10,8 +10,7 @@
 
 (re-frame/reg-event-fx
  ::navigate
- (fn [a [_ handler]]
-   (print handler)
+ (fn [_ [_ handler]]
    {:navigate handler}))
 
 (re-frame/reg-event-fx
