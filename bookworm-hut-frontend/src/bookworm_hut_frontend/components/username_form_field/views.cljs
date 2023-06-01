@@ -2,7 +2,7 @@
   (:require
    [reagent.core :as reagent]))
 
-(defn username-form-field [hint error-hint valid-fn? valid?]
+(defn username-form-field [hint error-hint valid-fn? valid? username]
   (let [empty? (reagent/atom true)]
     (fn []
       [:div.field
@@ -11,9 +11,10 @@
                        :placeholder hint
                        :name "username"
                        :class (when (not @empty?) (if @valid? "is-success" "is-danger"))
-                       :on-change #(let [username (-> % .-target .-value)]
-                                     (reset! valid? (valid-fn? username))
-                                     (reset! empty? (> 0 (count username))))}]
+                       :on-change #(let [value (-> % .-target .-value)]
+                                     (reset! valid? (valid-fn? value))
+                                     (reset! empty? (> 0 (count value)))
+                                     (reset! username value))}]
         [:span.icon.is-small.is-left
          [:i.fas.fa-user]]]
        [:label.help.is-danger

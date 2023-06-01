@@ -2,7 +2,7 @@
   (:require
    [reagent.core :as reagent]))
 
-(defn password-form-field [hint error-hint valid-fn? valid?]
+(defn password-form-field [hint error-hint valid-fn? valid? password]
   (let [show-password? (reagent/atom false)
         empty? (reagent/atom true)]
     (fn []
@@ -12,9 +12,10 @@
                        :placeholder hint
                        :name "password"
                        :class (when (not @empty?) (if @valid? "is-success" "is-danger"))
-                       :on-change #(let [password (-> % .-target .-value)]
-                                     (reset! valid? (valid-fn? password))
-                                     (reset! empty? (> 0 (count password))))}]
+                       :on-change #(let [value (-> % .-target .-value)]
+                                     (reset! valid? (valid-fn? value))
+                                     (reset! empty? (> 0 (count value)))
+                                     (reset! password value))}]
         [:span.icon.is-small.is-left [:i.fas.fa-lock]]
         [:span.icon.is-small.is-right
          [:i.fas
