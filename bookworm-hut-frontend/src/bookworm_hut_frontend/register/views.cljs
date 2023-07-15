@@ -6,7 +6,9 @@
    [bookworm-hut-frontend.components.username-form-field.views :refer [username-form-field]]
    [bookworm-hut-frontend.components.password-form-field.views :refer [password-form-field]]
    [bookworm-hut-frontend.config :as config]
-   [bookworm-hut-frontend.register.events :as events]))
+   [bookworm-hut-frontend.register.events :as events]
+   [bookworm-hut-frontend.subs :as subs]
+   [bookworm-hut-frontend.translations :as tr]))
 
 (spec/def ::username (spec/and string? #(< 2 (count %))))
 (defn username-valid? [username]
@@ -28,21 +30,20 @@
   (let [username-filled? (reagent/atom false)
         username (reagent/atom "")
         password-filled? (reagent/atom false)
-        password (reagent/atom "")]
+        password (reagent/atom "")
+        locale (re-frame/subscribe [::subs/locale])]
     (fn []
       [:div
-       {:style {:display "flex" :flex-direction "column"}
-        :action (str config/url "/register")
-        :method "post"}
+       {:style {:display "flex" :flex-direction "column"}}
        [username-form-field
-        "Username"
-        "Minimum length is 3"
+        (tr/tr @locale '(:register :username-hint))
+        (tr/tr @locale '(:register :username-error-hint))
         username-valid?
         username-filled?
         username]
-       [password-form-field
-        "Password"
-        "Minimum length is 16"
+      [password-form-field
+        (tr/tr @locale '(:register :password-hint))
+        (tr/tr @locale '(:register :password-error-hint))
         password-valid?
         password-filled?
         password]

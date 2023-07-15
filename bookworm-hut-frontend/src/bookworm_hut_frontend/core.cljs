@@ -16,4 +16,5 @@
 (defn init []
   (routes/start!)
   (re-frame/dispatch-sync [::events/initialize-db])
+  (re-frame/dispatch [::events/set-locale (keyword (. js/navigator -language))])
   (mount-root))

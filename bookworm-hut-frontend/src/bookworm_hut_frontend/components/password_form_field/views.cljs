@@ -5,7 +5,7 @@
 (defn password-form-field [hint error-hint valid-fn? valid? password]
   (let [show-password? (reagent/atom false)
         empty? (reagent/atom true)]
-    (fn []
+    (fn [hint error-hint valid-fn? valid? password]
       [:div.field
        [:p.control.has-icons-left.has-icons-right
         [:input.input {:type (if @show-password? "text" "password")

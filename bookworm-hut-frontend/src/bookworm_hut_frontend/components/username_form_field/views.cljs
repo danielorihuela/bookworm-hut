@@ -4,7 +4,7 @@
 
 (defn username-form-field [hint error-hint valid-fn? valid? username]
   (let [empty? (reagent/atom true)]
-    (fn []
+    (fn [hint error-hint valid-fn? valid? username]
       [:div.field
        [:p.control.has-icons-left
         [:input.input {:type "text"
