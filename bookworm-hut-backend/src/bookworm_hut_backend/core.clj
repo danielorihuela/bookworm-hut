@@ -1,41 +1,46 @@
 (ns bookworm-hut-backend.core
   (:require [ring.adapter.jetty :as jetty]
-            [ring.middleware.json]
+            [ring.util.request :as request]
+            [ring.middleware.json :as json]
             [ring.middleware.cors :as cors]
+            [ring.middleware.params :as params]
+            [ring.middleware.keyword-params :as keyword-params]
             [compojure.core :refer :all]
             [compojure.route :as route]
-            [clojure.pprint :as pprint]))
+            [clojure.pprint :as pprint]
+            [bookworm-hut-backend.db.users :as users-repository]))
 
-(defn get-username-handler [request]
-  {:status 200
-   :body {:name "elodin" :description "Naming professor"}
-   :headers {"Content-type" "application.json"} })
+;; In production environments we should handle different types of
+;; errors in different maners.
+;; For example, 400 for incorrect data and 500 if the backend
+;; cannot access the database.
+;; For that, we should look into the SQLState that we can obtain
+;; with (.getSQLState e).
+;; For a side project I don't need it.
+(defn register [username password]
+  (try
+    (do
+      (users-repository/insert-user username password)
+      {:status 200
+       :body {:username username :password password}
+       :headers {"Content-type" "application/json"} })
+    (catch Exception e
+      {:status 400
+       :body {:errorCode "INVALID_DATA_FORMAT" :error "Wrong username or password format"}
+       :headers {"Content-type" "application/json"} })))
 
 (defroutes all-routes
-  (GET "/" [] get-username-handler)
+  (POST "/register" [username password] (register username password))
   (route/not-found "<h1>Page not found</h1>"))
-
-
-(defn cors-headers []
-  {"Access-Control-Allow-Origin"  "http://localhost:8280"})
-
-(defn wrap-cors [handler]
-  (fn [req]
-    (let [response (handler req)]
-      (assoc response :headers (merge (:headers response) (cors-headers))))))
-
-(defn print-response [handler]
-  (fn [req]
-      (pprint/pprint (handler req))
-      (handler req)))
 
 (def app
   (-> all-routes
-      ring.middleware.json/wrap-json-response
-      (cors/wrap-cors :access-control-allow-origin [#"http://localhost:8280"]
-                      :access-control-allow-methods [:get])
-      ;;wrap-cors
-      print-response
+      keyword-params/wrap-keyword-params
+      params/wrap-params
+      json/wrap-json-response
+      (cors/wrap-cors
+       :access-control-allow-origin [#"http://localhost:8280"]
+       :access-control-allow-methods [:get :post])
       ))
 
 (defn start-server []
