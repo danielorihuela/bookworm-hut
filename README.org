@@ -12,28 +12,70 @@ The idea of the project is to create a simple book reading tracker while improvi
 
 ** Local Development
 
+Check each folder README.
+
 *** Frontend
 
+Install and start the app. Code changes are automatically pushed to your browser on save.
+
 #+begin_src bash
-npx shadow-cljs watch app
+  npm install
+  npx shadow-cljs watch app
 #+end_src
+
+Running the app with repl in emacs
+
+1. Execute "cider-jack-in-cljs"
+2. Select "shadow"
+3. Select ":app"
+4. Wait
+5. Emacs will ask if you want to visit the web in the browser. Press "y" and it will be automatically opened for you.
+
+We can run it on release mode with
+
+#+begin_src bash
+  npm install
+  npm run release
+#+end_src
+
+The `resources/public/js/compiled` directory is created, containing the compiled `app.js` and
+`manifest.edn` files.
 
 *** Backend
 
+We need a postgres sql database. Install docker and execute the following commands
+
 #+begin_src bash
-lein repl
+  docker pull postgres
+  docker run --name bookworm_hut_postgres -e POSTGRES_USER=bookworm_hut POSTGRES_PASSWORD=bookworm_hut -d -p 5432:5432 postgres
+#+end_src
+
+Now, you can connect to the docker, create the users table and see the information in the database.
+
+#+begin_src bash
+  docker exec -it 312396dfc63e bash
+  psql -U bookworm_hut
+  \c bookworm_hut
+  create table users (id SERIAL PRIMARY KEY NOT NULL, username varchar(30), password varchar(64));
+  select * from users;
+#+end_src
+
+To run the server repl, execute
+
+#+begin_src bash
+  lein repl
 #+end_src
 
 Once the repl is initialized, we need to run
 
 #+begin_src lisp
-(start-server)
+  (start-server)
 #+end_src
 
 After that, we can reload the code after modifying it with
 
 #+begin_src lisp
-(use 'bookworm-hut-backend.core :reload)
+  (use 'bookworm-hut-backend.core :reload)
 #+end_src
 
 *UNLESS* we modify the =start-server=
