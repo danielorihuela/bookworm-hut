@@ -1,22 +1,32 @@
 # bookworm-hut-backend
 
-A Clojure library designed to ... well, that part is up to you.
+## Set up local postgre sql with docker
 
-## Usage
+Install docker and execute the following commands
 
-FIXME
+#+begin_src bash
+docker pull postgres
+docker run --name bookworm_hut_postgres -e POSTGRES_USER=bookworm_hut POSTGRES_PASSWORD=bookworm_hut -d -p 5432:5432 postgres
+#+end_src
 
-## License
+Now, you can connect to the docker, create a table and see the information in the database.
 
-Copyright © 2023 FIXME
+#+begin_src bash
+docker exec -it 312396dfc63e bash
+psql -U bookworm_hut
+\c bookworm_hut
+create table users (id SERIAL PRIMARY KEY NOT NULL, username varchar(30), password varchar(64));
+select * from users;
+#+end_src
 
-This program and the accompanying materials are made available under the
-terms of the Eclipse Public License 2.0 which is available at
-http://www.eclipse.org/legal/epl-2.0.
+To run the backend server, from this folder run:
 
-This Source Code may also be made available under the following Secondary
-Licenses when the conditions for such availability set forth in the Eclipse
-Public License, v. 2.0 are satisfied: GNU General Public License as published by
-the Free Software Foundation, either version 2 of the License, or (at your
-option) any later version, with the GNU Classpath Exception which is available
-at https://www.gnu.org/software/classpath/license.html.
+#+begin_src
+lein repl
+// Inside the repl
+(start-server)
+// If you modify some code, reload the file you just modified
+// Examples
+(use 'bookworm-hut-backend.core :reload)
+(use 'bookworm-hut-backend.config.db :reload)
+#+end_src
