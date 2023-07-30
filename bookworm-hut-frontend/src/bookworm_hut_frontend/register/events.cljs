@@ -28,5 +28,8 @@
  ::bad-register-response
  (fn
    [db [_ response]]
-   (print "ERROR")
-   (print response)))
+   (let [response (:response response)
+         errorCode (:errorCode response)]
+     (if (= (compare errorCode "INVALID_DATA_FORMAT") 0)
+       (js/alert "Username or password format is wrong")))))
+
