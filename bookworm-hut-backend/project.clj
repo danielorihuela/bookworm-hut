@@ -7,5 +7,6 @@
                  [compojure "1.7.0"]
                  [com.github.seancorfield/next.jdbc "1.3.883"]
                  [org.postgresql/postgresql "42.6.0"]
-                 [com.github.seancorfield/honeysql "2.4.1045"]]
+                 [com.github.seancorfield/honeysql "2.4.1045"]
+                 [buddy/buddy-hashers "2.0.167"]]
   :repl-options {:init-ns bookworm-hut-backend.core})

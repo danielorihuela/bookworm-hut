@@ -8,6 +8,7 @@
             [compojure.core :refer :all]
             [compojure.route :as route]
             [clojure.pprint :as pprint]
+            [buddy.hashers :as hashers]
             [bookworm-hut-backend.db.users :as users-repository]))
 
 ;; In production environments we should handle different types of
@@ -20,7 +21,9 @@
 (defn register [username password]
   (try
     (do
-      (users-repository/insert-user username password)
+      (users-repository/insert-user
+       username
+       (hashers/derive password {:alg :scrypt}))
       {:status 200
        :body {:username username :password password}
        :headers {"Content-type" "application/json"} })
