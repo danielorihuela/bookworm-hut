@@ -24,8 +24,7 @@
       (users-repository/insert-user
        username
        (hashers/derive password {:alg :scrypt}))
-      {:status 200
-       :body {:username username :password password}
+      {:status 201
        :headers {"Content-type" "application/json"} })
     (catch Exception e
       {:status 400
