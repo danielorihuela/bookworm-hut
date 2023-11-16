@@ -11,7 +11,6 @@
 (re-frame/reg-event-db
  ::set-locale
  (fn [db [_ locale]]
-   (print locale)
    (assoc db :locale locale)))
 
 (re-frame/reg-event-fx

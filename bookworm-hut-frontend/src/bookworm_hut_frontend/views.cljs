@@ -17,8 +17,6 @@
    [:h1 "HOME PANEL"]
    [:button {:on-click #(re-frame/dispatch [::events/navigate :register])} "Register"]])
 
-(defmethod routes/panels :home-panel [] [home-panel])
-
 (defn register-panel []
   [:div {:style (conj {:height "100vh"} (flex-col-center-vh))}
    [:div {:style (conj {:flex-grow 1} (flex-col-center-vh))}
@@ -27,8 +25,13 @@
    [:div {:style {:flex-grow 2}}
     [bookworm-hut-frontend.register.views/register-form]]])
 
-(defmethod routes/panels :register-panel [] [register-panel])
+(defn panels [panel]
+  (case panel
+    :home-panel (home-panel)
+    :register-panel (register-panel)
+    [:div "404 NOT FOUND"]
+    ))
 
 (defn main-panel []
   (let [active-panel (re-frame/subscribe [::subs/active-panel])]
-    (routes/panels @active-panel)))
+    (panels @active-panel)))

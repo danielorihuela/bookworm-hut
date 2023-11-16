@@ -4,34 +4,39 @@
             [re-frame.core :as re-frame]
             [bookworm-hut-frontend.events :as events]))
 
-(defmulti panels identity)
-(defmethod panels :default [] [:div "404 NOT FOUND"])
-
 (def routes
-  (atom
-    ["/" {""      :home
-          "register" :register}]))
-
-(defn parse [url]
-  (bidi/match-route @routes url))
-
-(defn url-for [& args]
-  (apply bidi/path-for (into [@routes] args)))
+  ["/" {""      :home
+        "register" :register}])
 
 (defn dispatch [route]
-  (let [panel (keyword (str (name (:handler route)) "-panel"))]
-    (re-frame/dispatch [::events/set-active-panel panel])))
+  (re-frame/dispatch [::events/set-active-panel route]))
 
+(defn match
+  [url]
+  (get (bidi/match-route routes url) :handler))
+
+(defn path-to-view-id
+  [route-key]
+  (keyword (str (name route-key) "-panel")))
+
+;;; Define the routing history of our web app
+;;; `match` returns the route id for the given url, nil otherwise
+;;; `path-to-view-id` transforms the route id into the view id
+;;; `dispatch` gets called when a match is found
 (defonce history
-  (pushy/pushy dispatch parse))
+  (pushy/pushy dispatch
+               match
+               {:identity-fn path-to-view-id}))
 
-(defn navigate! [handler]
-  (pushy/set-token! history (url-for handler)))
-
-(defn start! []
+(defn start!
+  "Start event listeners for the routing library"
+  []
   (pushy/start! history))
 
+;; We will call this function whenever the user "clicks" or
+;; performs any other action that requires the page to
+;; change the url and the view.
 (re-frame/reg-fx
  :navigate
- (fn [handler]
-   (navigate! handler)))
+ (fn [route-key]
+   (pushy/set-token! history (bidi/path-for routes route-key))))
