@@ -2,11 +2,11 @@
   (:require
    [reagent.core :as reagent]))
 
-(defn password-form-field [hint error-hint valid-fn? password]
+(defn password-form-field [password valid-fn? hint error-hint valid-fn?]
   (let [show-password? (reagent/atom false)
         empty? (reagent/atom true)
         valid? (reagent/atom false)]
-    (fn [hint error-hint valid-fn? password]
+    (fn [password valid-fn? hint error-hint]
       [:div.field
        [:p.control.has-icons-left.has-icons-right
         [:span.icon.is-small.is-left [:i.fas.fa-lock]]

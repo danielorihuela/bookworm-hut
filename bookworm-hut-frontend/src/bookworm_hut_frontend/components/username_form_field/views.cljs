@@ -2,10 +2,10 @@
   (:require
    [reagent.core :as reagent]))
 
-(defn username-form-field [hint error-hint valid-fn? username]
+(defn username-form-field [username valid-fn? hint error-hint]
   (let [empty? (reagent/atom true)
         valid? (reagent/atom false)]
-    (fn [hint error-hint valid-fn? username]
+    (fn [username valid-fn? hint error-hint]
       [:div.field
        [:p.control.has-icons-left
         [:span.icon.is-small.is-left [:i.fas.fa-user]]

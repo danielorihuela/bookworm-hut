@@ -7,12 +7,14 @@
            {:username-hint "Username"
             :username-error-hint "Minimum length is 3"
             :password-hint "Password"
-            :password-error-hint "Minimum length is 16"}}
+            :password-error-hint "Minimum length is 16"
+            :submit "Register"}}
    :es-ES {:register
            {:username-hint "Usuario"
             :username-error-hint "Longitud mínima es 3"
             :password-hint "Contraseña"
-            :password-error-hint "Longitud mínima es 16"}}})
+            :password-error-hint "Longitud mínima es 16"
+            :submit "Registrar"}}})
 
 (defn tr [locale keys]
   (reduce #(%1 %2)

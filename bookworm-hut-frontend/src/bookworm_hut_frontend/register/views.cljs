@@ -18,10 +18,10 @@
 (defn password-valid? [password]
   (spec/valid? ::password password))
 
-(defn submit-button [username password]
+(defn submit-button [username password locale]
   [:input.button.is-primary
    {:type "submit"
-    :value "Register"
+    :value (tr/tr locale '(:register :submit))
     :style {:align-self "center"}
     :disabled (or (not (username-valid? @username)) (not (password-valid? @password)))
     :on-click #(re-frame/dispatch [::events/register @username @password])}])
@@ -34,14 +34,13 @@
       [:div
        {:style {:display "flex" :flex-direction "column"}}
        [username-form-field
-        (tr/tr @locale '(:register :username-hint))
-        (tr/tr @locale '(:register :username-error-hint))
+        username
         username-valid?
-        username]
-      [password-form-field
-        (tr/tr @locale '(:register :password-hint))
-        (tr/tr @locale '(:register :password-error-hint))
+        (tr/tr @locale '(:register :username-hint))
+        (tr/tr @locale '(:register :username-error-hint))]
+       [password-form-field
+        password
         password-valid?
-        password]
-       [submit-button username password]
-       ])))
+        (tr/tr @locale '(:register :password-hint))
+        (tr/tr @locale '(:register :password-error-hint))]
+       [submit-button username password @locale]])))
