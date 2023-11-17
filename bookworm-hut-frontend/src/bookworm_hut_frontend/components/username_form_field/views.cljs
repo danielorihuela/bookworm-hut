@@ -2,11 +2,13 @@
   (:require
    [reagent.core :as reagent]))
 
-(defn username-form-field [hint error-hint valid-fn? valid? username]
-  (let [empty? (reagent/atom true)]
-    (fn [hint error-hint valid-fn? valid? username]
+(defn username-form-field [hint error-hint valid-fn? username]
+  (let [empty? (reagent/atom true)
+        valid? (reagent/atom false)]
+    (fn [hint error-hint valid-fn? username]
       [:div.field
        [:p.control.has-icons-left
+        [:span.icon.is-small.is-left [:i.fas.fa-user]]
         [:input.input {:type "text"
                        :placeholder hint
                        :name "username"
@@ -14,9 +16,7 @@
                        :on-change #(let [value (-> % .-target .-value)]
                                      (reset! valid? (valid-fn? value))
                                      (reset! empty? (> 0 (count value)))
-                                     (reset! username value))}]
-        [:span.icon.is-small.is-left
-         [:i.fas.fa-user]]]
+                                     (reset! username value))}]]
        [:label.help.is-danger
         {:style {:visibility (when (or @valid? @empty?) "hidden")}}
         error-hint]])))

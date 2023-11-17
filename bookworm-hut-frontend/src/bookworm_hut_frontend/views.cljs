@@ -29,8 +29,7 @@
   (case panel
     :home-panel (home-panel)
     :register-panel (register-panel)
-    [:div "404 NOT FOUND"]
-    ))
+    [:div "404 NOT FOUND"]))
 
 (defn main-panel []
   (let [active-panel (re-frame/subscribe [::subs/active-panel])]

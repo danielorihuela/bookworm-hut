@@ -2,12 +2,14 @@
   (:require
    [reagent.core :as reagent]))
 
-(defn password-form-field [hint error-hint valid-fn? valid? password]
+(defn password-form-field [hint error-hint valid-fn? password]
   (let [show-password? (reagent/atom false)
-        empty? (reagent/atom true)]
-    (fn [hint error-hint valid-fn? valid? password]
+        empty? (reagent/atom true)
+        valid? (reagent/atom false)]
+    (fn [hint error-hint valid-fn? password]
       [:div.field
        [:p.control.has-icons-left.has-icons-right
+        [:span.icon.is-small.is-left [:i.fas.fa-lock]]
         [:input.input {:type (if @show-password? "text" "password")
                        :placeholder hint
                        :name "password"
@@ -16,7 +18,6 @@
                                      (reset! valid? (valid-fn? value))
                                      (reset! empty? (> 0 (count value)))
                                      (reset! password value))}]
-        [:span.icon.is-small.is-left [:i.fas.fa-lock]]
         [:span.icon.is-small.is-right
          [:i.fas
           {:class (if @show-password? "fa-eye-slash" "fa-eye")

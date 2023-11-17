@@ -18,18 +18,16 @@
 (defn password-valid? [password]
   (spec/valid? ::password password))
 
-(defn submit-button [username-filled? username password-filled? password]
+(defn submit-button [username password]
   [:input.button.is-primary
    {:type "submit"
     :value "Register"
     :style {:align-self "center"}
-    :disabled (when (or (not @username-filled?) (not @password-filled?)) true)
+    :disabled (or (not (username-valid? @username)) (not (password-valid? @password)))
     :on-click #(re-frame/dispatch [::events/register @username @password])}])
 
 (defn register-form []
-  (let [username-filled? (reagent/atom false)
-        username (reagent/atom "")
-        password-filled? (reagent/atom false)
+  (let [username (reagent/atom "")
         password (reagent/atom "")
         locale (re-frame/subscribe [::subs/locale])]
     (fn []
@@ -39,16 +37,11 @@
         (tr/tr @locale '(:register :username-hint))
         (tr/tr @locale '(:register :username-error-hint))
         username-valid?
-        username-filled?
         username]
       [password-form-field
         (tr/tr @locale '(:register :password-hint))
         (tr/tr @locale '(:register :password-error-hint))
         password-valid?
-        password-filled?
         password]
-       [submit-button
-        username-filled?
-        username
-        password-filled?
-        password]])))
+       [submit-button username password]
+       ])))
