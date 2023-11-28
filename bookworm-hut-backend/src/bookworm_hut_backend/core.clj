@@ -5,11 +5,20 @@
             [ring.middleware.cors :as cors]
             [ring.middleware.params :as params]
             [ring.middleware.keyword-params :as keyword-params]
+            [clojure.spec.alpha :as spec]
             [compojure.core :refer :all]
             [compojure.route :as route]
             [clojure.pprint :as pprint]
             [buddy.hashers :as hashers]
             [bookworm-hut-backend.db.users :as users-repository]))
+
+(spec/def ::username (spec/and string? #(< 2 (count %))))
+(defn username-valid? [username]
+  (spec/valid? ::username username))
+
+(spec/def ::password (spec/and string? #(< 7 (count %))))
+(defn password-valid? [password]
+  (spec/valid? ::password password))
 
 ;; In production environments we should handle different types of
 ;; errors in different maners.
@@ -20,15 +29,19 @@
 ;; For a side project I don't need it.
 (defn register [username password]
   (try
-    (do
-      (users-repository/insert-user
-       username
-       (hashers/derive password {:alg :scrypt}))
-      {:status 201
-       :headers {"Content-type" "application/json"} })
+    (if (and (username-valid? username) (password-valid? password))
+      (do
+        (users-repository/insert-user
+         username
+         (hashers/derive password {:alg :scrypt}))
+        {:status 201
+         :body {}
+         :headers {"Content-type" "application/json"}})
+      (throw (Exception. "Wrong credentials format")))
     (catch Exception e
       {:status 400
-       :body {:errorCode "INVALID_DATA_FORMAT" :error "Wrong username or password format"}
+       :body {:errorCode "INVALID_DATA_FORMAT"
+              :error "Wrong username or password format"}
        :headers {"Content-type" "application/json"} })))
 
 (defroutes all-routes
