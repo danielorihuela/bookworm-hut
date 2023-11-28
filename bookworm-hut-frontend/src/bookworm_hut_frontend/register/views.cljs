@@ -14,7 +14,7 @@
 (defn username-valid? [username]
   (spec/valid? ::username username))
 
-(spec/def ::password (spec/and string? #(< 15 (count %))))
+(spec/def ::password (spec/and string? #(< 7 (count %))))
 (defn password-valid? [password]
   (spec/valid? ::password password))
 
