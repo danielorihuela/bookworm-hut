@@ -4,6 +4,7 @@
    [bookworm-hut-frontend.subs :as subs]
    [bookworm-hut-frontend.events :as events]
    [bookworm-hut-frontend.register.views]
+   [bookworm-hut-frontend.login.views]
    [bookworm-hut-frontend.routes :as routes]))
 
 (defn flex-col-center-vh []
@@ -15,7 +16,8 @@
 (defn home-panel []
   [:div
    [:h1 "HOME PANEL"]
-   [:button {:on-click #(re-frame/dispatch [::events/navigate :register])} "Register"]])
+   [:button {:on-click #(re-frame/dispatch [::events/navigate :register])} "Register"]
+   [:button {:on-click #(re-frame/dispatch [::events/navigate :login])} "Login"]])
 
 (defn register-panel []
   [:div {:style (conj {:height "100vh"} (flex-col-center-vh))}
@@ -25,10 +27,19 @@
    [:div {:style {:flex-grow 2}}
     [bookworm-hut-frontend.register.views/register-form]]])
 
+(defn login-panel []
+  [:div {:style (conj {:height "100vh"} (flex-col-center-vh))}
+   [:div {:style (conj {:flex-grow 1} (flex-col-center-vh))}
+    [:label {:style {:font-size "2.5em"}} "Bookworm Hut"]
+    [:img {:src "logo.png" :width 150 :height 150}]]
+   [:div {:style {:flex-grow 2}}
+    [bookworm-hut-frontend.login.views/login-form]]])
+
 (defn panels [panel]
   (case panel
     :home-panel (home-panel)
     :register-panel (register-panel)
+    :login-panel (login-panel)
     [:div "404 NOT FOUND"]))
 
 (defn main-panel []
