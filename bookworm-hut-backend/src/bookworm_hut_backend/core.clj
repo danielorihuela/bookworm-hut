@@ -32,11 +32,12 @@
        :headers {"Content-type" "application/json"} })))
 
 (defroutes all-routes
-  (POST "/register" [username password] (register username password))
+  (POST "/register" {{username :username password :password} :body} (register username password))
   (route/not-found "<h1>Page not found</h1>"))
 
 (def app
   (-> all-routes
+      (#(json/wrap-json-body % {:keywords? true}))
       keyword-params/wrap-keyword-params
       params/wrap-params
       json/wrap-json-response
