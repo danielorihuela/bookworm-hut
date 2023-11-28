@@ -12,7 +12,7 @@
    {:http-xhrio {:method          :post
                  :uri             (str config/url "/register")
                  :params          {:username username :password password}
-                 :format          (ajax/url-request-format)
+                 :format          (ajax/json-request-format)
                  :response-format (ajax/json-response-format {:keywords? true}) 
                  :on-success      [::process-register-response]
                  :on-failure      [::bad-register-response]}
@@ -30,6 +30,7 @@
    [db [_ response]]
    (let [response (:response response)
          errorCode (:errorCode response)]
-     (if (= (compare errorCode "INVALID_DATA_FORMAT") 0)
-       (js/alert "Username or password format is wrong")))))
+     (case errorCode
+       "INVALID_DATA_FORMAT" (js/alert "Username or password format is wrong")
+       (js/alert "Something went wrong with the server")))))
 
