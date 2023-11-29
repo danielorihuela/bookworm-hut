@@ -10,7 +10,8 @@
             [compojure.route :as route]
             [clojure.pprint :as pprint]
             [buddy.hashers :as hashers]
-            [bookworm-hut-backend.db.users :as users-repository]))
+            [bookworm-hut-backend.db.users :as users-repository])
+  (:import (java.sql SQLException)))
 
 (spec/def ::username (spec/and string? #(< 2 (count %))))
 (defn username-valid? [username]
@@ -38,6 +39,17 @@
          :body {}
          :headers {"Content-type" "application/json"}})
       (throw (Exception. "Wrong credentials format")))
+    (catch java.sql.SQLException e
+      (println (.getSQLState e))
+      (case (.getSQLState e)
+        "23505" {:status 409
+                 :body {:errorCode "USERNAME_ALREADY_EXISTS"
+                        :error "Username already exists"}
+                 :headers {"Content-type" "application/json"} }
+        {:status 400
+         :body {:errorCode "INVALID_DATA_FORMAT"
+                :error "Wrong username or password format"}
+         :headers {"Content-type" "application/json"} }))
     (catch Exception e
       {:status 400
        :body {:errorCode "INVALID_DATA_FORMAT"

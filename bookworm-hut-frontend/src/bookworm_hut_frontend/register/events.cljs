@@ -32,6 +32,8 @@
 (re-frame/reg-fx
  :register-error-alert
  (fn [error-code]
-   (case error-code
-     "INVALID_DATA_FORMAT" (js/alert "Username or password format is wrong")
-     (js/alert "Something went wrong with the server"))))
+   (js/alert
+    (case error-code
+      "USERNAME_ALREADY_EXISTS" "Username already exists"
+      "INVALID_DATA_FORMAT" "Username or password format is wrong"
+      "Something went wrong with the server"))))
