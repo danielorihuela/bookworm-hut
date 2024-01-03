@@ -8,5 +8,6 @@
                  [com.github.seancorfield/next.jdbc "1.3.883"]
                  [org.postgresql/postgresql "42.6.0"]
                  [com.github.seancorfield/honeysql "2.4.1045"]
-                 [buddy/buddy-hashers "2.0.167"]]
+                 [buddy/buddy-hashers "2.0.167"]
+                 [buddy/buddy-auth "3.0.1"]]
   :repl-options {:init-ns bookworm-hut-backend.core})

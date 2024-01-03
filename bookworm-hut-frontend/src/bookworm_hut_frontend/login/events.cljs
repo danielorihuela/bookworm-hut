@@ -21,8 +21,8 @@
 (re-frame/reg-event-db                   
  ::process-login-response
  (fn
-   [db [_ {username :username password :password}]]
-   (js/alert (str "Username = " username ", Password = " password))))
+   [db [_ {token :token}]]
+   (js/alert (str "Token = " token))))
 
 (re-frame/reg-event-fx                  
  ::bad-login-response

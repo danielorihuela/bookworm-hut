@@ -10,8 +10,15 @@
             [compojure.route :as route]
             [clojure.pprint :as pprint]
             [buddy.hashers :as hashers]
+            [buddy.auth.backends :as backends]
+            [buddy.auth.middleware :refer (wrap-authentication)]
+            [buddy.sign.jwt :as jwt]
+            [cheshire.core :as cjson]
             [bookworm-hut-backend.db.users :as users-repository])
   (:import (java.sql SQLException)))
+
+(def secret "mysecret")
+(def backend (backends/jws {:secret secret}))
 
 (spec/def ::username (spec/and string? #(< 2 (count %))))
 (defn username-valid? [username]
@@ -21,20 +28,13 @@
 (defn password-valid? [password]
   (spec/valid? ::password password))
 
-;; In production environments we should handle different types of
-;; errors in different maners.
-;; For example, 400 for incorrect data and 500 if the backend
-;; cannot access the database.
-;; For that, we should look into the SQLState that we can obtain
-;; with (.getSQLState e).
-;; For a side project I don't need it.
 (defn register [username password]
   (try
     (if (and (username-valid? username) (password-valid? password))
       (do
         (users-repository/insert-user
          username
-         (hashers/derive password {:alg :scrypt}))
+         (hashers/derive password {:alg :argon2id}))
         {:status 201
          :body {}
          :headers {"Content-type" "application/json"}})
@@ -56,8 +56,30 @@
               :error "Wrong username or password format"}
        :headers {"Content-type" "application/json"} })))
 
+(defn login
+  [username password]
+  (try
+    (let [user (get (users-repository/get-user-by-name username) 0)
+          id (get user :users/id)
+          password-hash (get user :users/password)]
+      (if (true? (:valid (hashers/verify password password-hash)))
+        {:status 200
+         :body {:token (jwt/sign {:user id} secret)}
+         :headers {"Content-type" "application/json"}}
+        {:status 401
+         :body {:errorCode "WRONG_CREDENTIALS"
+                :error "Wrong username or password"}
+         :headers {"Content-type" "application/json"} }))
+    (catch Exception e
+      {:status 500
+       :body {:errorCode "UNEXPECTED_ERROR"
+              :error "Something unexpected went wrong"}
+       :headers {"Content-type" "application/json"} })))
+
+
 (defroutes all-routes
   (POST "/register" {{username :username password :password} :body} (register username password))
+  (POST "/login" {{username :username password :password} :body} (login username password))
   (route/not-found "<h1>Page not found</h1>"))
 
 (def app
