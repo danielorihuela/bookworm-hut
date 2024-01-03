@@ -5,26 +5,30 @@
 (def translations
   {:en-US
    {:register
-    {:username-hint "Username"
+    {:title "Register"
+     :username-hint "Username"
      :username-error-hint "Minimum length is 3"
      :password-hint "Password"
      :password-error-hint "Minimum length is 8"
      :submit "Register"}
     :login
-    {:username-hint "Username"
+    {:title "Login"
+     :username-hint "Username"
      :username-error-hint "Minimum length is 3"
      :password-hint "Password"
      :password-error-hint "Minimum length is 8"
      :submit "Login"}}
    :es-ES
    {:register
-    {:username-hint "Usuario"
+    {:title "Registrarse"
+     :username-hint "Usuario"
      :username-error-hint "Longitud mínima es 3"
      :password-hint "Contraseña"
      :password-error-hint "Longitud mínima es 8"
      :submit "Registrar"}
     :login
-    {:username-hint "Usuario"
+    {:title "Iniciar sesión"
+     :username-hint "Usuario"
      :username-error-hint "Longitud mínima es 3"
      :password-hint "Contraseña"
      :password-error-hint "Longitud mínima es 8"
