@@ -14,11 +14,21 @@
    :justify-content "center"
    :align-items "center"})
 
+(defn flex-col-vh []
+  {:display "flex"
+   :flex-direction "column"
+   :align-items "center"})
+
 (defn home-panel []
-  [:div
-   [:h1 "HOME PANEL"]
-   [:button {:on-click #(re-frame/dispatch [::events/navigate :register])} "Register"]
-   [:button {:on-click #(re-frame/dispatch [::events/navigate :login])} "Login"]])
+  (let [locale (re-frame/subscribe [::subs/locale])]
+    [:div {:style (conj {:height "100vh"} (flex-col-center-vh))}
+     [:div {:style (conj {:flex-grow 1} (flex-col-center-vh))}
+      [:label {:style {:font-size "2.5em"}} "Bookworm Hut"]
+      [:img {:src "logo.png" :width 150 :height 150}]]
+     [:div {:style (conj {:flex-grow 2 :gap "2em"} (flex-col-vh))}
+      [:button.button.is-primary  {:style {:width "10rem"} :on-click #(re-frame/dispatch [::events/navigate :register])} (tr/tr @locale '(:register :title))]
+      [:button.button.is-primary {:style {:width "10rem"} :on-click #(re-frame/dispatch [::events/navigate :login])} (tr/tr @locale '(:login :title))]]
+     ]))
 
 (defn register-panel []
   (let [locale (re-frame/subscribe [::subs/locale])]
