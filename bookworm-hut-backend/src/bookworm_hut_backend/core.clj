@@ -10,15 +10,17 @@
             [compojure.route :as route]
             [clojure.pprint :as pprint]
             [buddy.hashers :as hashers]
+            [buddy.auth :as auth]
             [buddy.auth.backends :as backends]
             [buddy.auth.middleware :refer (wrap-authentication)]
+            [buddy.auth.accessrules :refer [wrap-access-rules]]
             [buddy.sign.jwt :as jwt]
             [cheshire.core :as cjson]
             [bookworm-hut-backend.db.users :as users-repository])
   (:import (java.sql SQLException)))
 
 (def secret "mysecret")
-(def backend (backends/jws {:secret secret}))
+(def backend (backends/jws {:secret secret :token-name "Bearer"}))
 
 (spec/def ::username (spec/and string? #(< 2 (count %))))
 (defn username-valid? [username]
@@ -76,15 +78,39 @@
               :error "Something unexpected went wrong"}
        :headers {"Content-type" "application/json"} })))
 
-
 (defroutes all-routes
   (POST "/register" {{username :username password :password} :body} (register username password))
   (POST "/login" {{username :username password :password} :body} (login username password))
   (route/not-found "<h1>Page not found</h1>"))
 
+(def access-rules [{:pattern #"/register"
+                    :handler (fn [_] true)}
+                   {:pattern #"/login"
+                    :handler (fn [_] true)}
+                   {:pattern #".*"
+                    :handler (fn [request]
+                               (auth/authenticated? request))}])
+
+(defn on-error
+  [request value]
+  {:status 403
+   :headers {}
+   :body "Unauthenticated"})
+
+;; Print request, useful for printing
+;; the transformation in the `app`
+;; below
+(defn wrap-print-request [handler]
+  (fn [request]
+    (println request)
+    (handler request)))
+
 (def app
   (-> all-routes
-      (#(json/wrap-json-body % {:keywords? true}))
+      (wrap-access-rules {:rules access-rules :on-error on-error})
+      (wrap-authentication backend)
+      (json/wrap-json-body {:keywords? true})
+      ;;wrap-print-request
       keyword-params/wrap-keyword-params
       params/wrap-params
       json/wrap-json-response
