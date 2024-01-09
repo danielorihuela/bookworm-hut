@@ -16,7 +16,8 @@
             [buddy.auth.accessrules :refer [wrap-access-rules]]
             [buddy.sign.jwt :as jwt]
             [cheshire.core :as cjson]
-            [bookworm-hut-backend.db.users :as users-repository])
+            [bookworm-hut-backend.db.users :as users-repository]
+            [bookworm-hut-backend.db.books :as books-repository])
   (:import (java.sql SQLException)))
 
 (def secret "mysecret")
@@ -42,7 +43,6 @@
          :headers {"Content-type" "application/json"}})
       (throw (Exception. "Wrong credentials format")))
     (catch java.sql.SQLException e
-      (println (.getSQLState e))
       (case (.getSQLState e)
         "23505" {:status 409
                  :body {:errorCode "USERNAME_ALREADY_EXISTS"
@@ -62,11 +62,11 @@
   [username password]
   (try
     (let [user (get (users-repository/get-user-by-name username) 0)
-          id (get user :users/id)
+          id (get user :users/username)
           password-hash (get user :users/password)]
       (if (true? (:valid (hashers/verify password password-hash)))
         {:status 200
-         :body {:token (jwt/sign {:user id} secret)}
+         :body {:token (jwt/sign {:id id} secret)}
          :headers {"Content-type" "application/json"}}
         {:status 401
          :body {:errorCode "WRONG_CREDENTIALS"
@@ -78,9 +78,47 @@
               :error "Something unexpected went wrong"}
        :headers {"Content-type" "application/json"} })))
 
+(spec/def ::bookname (spec/and string? #(< 0 (count %))))
+(defn bookname-valid? [bookname]
+  (spec/valid? ::bookname bookname))
+
+(spec/def ::num-pages (spec/and number? #(< 0 %)))
+(defn num-pages-valid? [num-pages]
+  (spec/valid? ::num-pages num-pages))
+
+(spec/def ::year (spec/and number? #(< 1899 %) #(< % 4001)))
+(defn year-valid? [year]
+  (spec/valid? ::year year))
+
+(spec/def ::month (spec/and number? #(< 0 %) #(< % 13)))
+(defn month-valid? [month]
+  (spec/valid? ::month month))
+
+(defn add-book
+  [username bookname num-pages year month]
+  (try
+    (if (and (username-valid? username)
+             (bookname-valid? bookname)
+             (num-pages-valid? num-pages)
+             (year-valid? year)
+             (month-valid? month))
+      (do
+        (books-repository/insert-book
+         username bookname num-pages year month)
+        {:status 201
+         :body {}
+         :headers {"Content-type" "application/json"}})
+      (throw (Exception. "Book could not be added")))
+    (catch Exception e
+      {:status 500
+       :body {:errorCode "UNKNOWN_ERROR"
+              :error "Something went wrong"}
+       :headers {"Content-type" "application/json"} })))
+
 (defroutes all-routes
   (POST "/register" {{username :username password :password} :body} (register username password))
   (POST "/login" {{username :username password :password} :body} (login username password))
+  (POST "/users/:id/books" {{id :id} :params {bookname :bookname num-pages :num-pages year :year month :month} :body} (add-book id bookname num-pages year month))
   (route/not-found "<h1>Page not found</h1>"))
 
 (def access-rules [{:pattern #"/register"

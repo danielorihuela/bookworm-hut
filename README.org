@@ -50,14 +50,17 @@ We need a postgres sql database. Install docker and execute the following comman
   docker run --name bookworm_hut_postgres -e POSTGRES_USER=bookworm_hut -e POSTGRES_PASSWORD=bookworm_hut -d -p 5432:5432 postgres
 #+end_src
 
-Now, you can connect to the docker, create the users table and see the information in the database.
+Now, you can connect to the docker, create the tables and see the information in the database.
 
 #+begin_src bash
   docker exec -it bookworm_hut_postgres bash
   psql -U bookworm_hut
   \c bookworm_hut
-  create table users (id SERIAL PRIMARY KEY NOT NULL, username varchar(30) UNIQUE, password varchar(300));
+  create table users (username varchar(30) UNIQUE NOT NULL, password varchar(300));
+  create table books (bookname varchar(50), pages smallint, year smallint, month smallint, username varchar(30), constraint fk_user FOREIGN KEY(username) REFERENCES users(username));
+
   select * from users;
+  select * from books;
 #+end_src
 
 To run the server repl, execute
