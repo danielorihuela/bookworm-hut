@@ -6,6 +6,7 @@
             [ring.middleware.params :as params]
             [ring.middleware.keyword-params :as keyword-params]
             [clojure.spec.alpha :as spec]
+            [clojure.set :as set]
             [compojure.core :refer :all]
             [compojure.route :as route]
             [clojure.pprint :as pprint]
@@ -115,10 +116,30 @@
               :error "Something went wrong"}
        :headers {"Content-type" "application/json"} })))
 
+(defn get-books
+  [username]
+  (try
+    (let [raw-books (books-repository/get-read-books username)
+          books (->> raw-books
+                     (map #(select-keys % [:books/bookname :books/pages :books/year :books/month]))
+                     (map #(set/rename-keys % {:books/bookname :bookname
+                                               :books/pages :new-pages
+                                               :books/year :year
+                                               :books/month :month})))]
+      {:status 200
+       :body {:books books}
+       :headers {"Content-type" "application/json"}})
+    (catch Exception e
+      {:status 500
+       :body {:errorCode "UNKNOWN_ERROR"
+              :error "Something went wrong"}
+       :headers {"Content-type" "application/json"} })))
+
 (defroutes all-routes
   (POST "/register" {{username :username password :password} :body} (register username password))
   (POST "/login" {{username :username password :password} :body} (login username password))
   (POST "/users/:id/books" {{id :id} :params {bookname :bookname num-pages :num-pages year :year month :month} :body} (add-book id bookname num-pages year month))
+  (GET "/users/:id/books" {{id :id} :params} (get-books id))
   (route/not-found "<h1>Page not found</h1>"))
 
 (def access-rules [{:pattern #"/register"

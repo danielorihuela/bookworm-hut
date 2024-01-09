@@ -12,3 +12,13 @@
   (jdbc/execute!
    db-config/db
    (sql/format (insert-book-query username bookname num-pages year month))))
+
+(defn get-read-books-query [username]
+  {:select [:*]
+   :from [:books]
+   :where [:= :username username]})
+
+(defn get-read-books [username]
+  (jdbc/execute!
+   db-config/db
+   (sql/format (get-read-books-query username))))
