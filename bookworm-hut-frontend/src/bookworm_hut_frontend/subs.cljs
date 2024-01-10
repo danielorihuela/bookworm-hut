@@ -21,3 +21,8 @@
  ::locale
  (fn [db _]
    (:locale db)))
+
+(re-frame/reg-sub
+ ::read-books
+ (fn [db _]
+   (:read-books db)))

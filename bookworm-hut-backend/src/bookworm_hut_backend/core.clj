@@ -123,7 +123,7 @@
           books (->> raw-books
                      (map #(select-keys % [:books/bookname :books/pages :books/year :books/month]))
                      (map #(set/rename-keys % {:books/bookname :bookname
-                                               :books/pages :new-pages
+                                               :books/pages :num-pages
                                                :books/year :year
                                                :books/month :month})))]
       {:status 200

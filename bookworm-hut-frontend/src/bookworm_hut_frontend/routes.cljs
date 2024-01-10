@@ -7,7 +7,8 @@
 (def routes
   ["/" {""      :home
         "register" :register
-        "login" :login}])
+        "login" :login
+        "read-books" :read-books}])
 
 (defn dispatch [route]
   (re-frame/dispatch [::events/set-active-panel route]))

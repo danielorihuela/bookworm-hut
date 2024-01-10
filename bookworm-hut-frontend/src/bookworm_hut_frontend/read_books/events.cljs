@@ -1,4 +1,4 @@
-(ns bookworm-hut-frontend.login.events
+(ns bookworm-hut-frontend.read-books.events
   (:require
    [re-frame.core :as re-frame]
    [ajax.core :as ajax]
@@ -7,38 +7,6 @@
    [clojure.string :as str]
    [bookworm-hut-frontend.config :as config]))
 
-(re-frame/reg-event-fx
- ::login
- (fn
-   [{db :db} [_ username password]]
-   {:http-xhrio {:method          :post
-                 :uri             (str config/url "/login")
-                 :params          {:username username :password password}
-                 :format          (ajax/json-request-format)
-                 :response-format (ajax/json-response-format {:keywords? true}) 
-                 :on-success      [::process-login-response]
-                 :on-failure      [::bad-login-response]}
-    }))
-
-(re-frame/reg-event-fx
- ::process-login-response
- (fn [{db :db} [_ {token :token}]]
-   {:db (assoc db :token token)
-    :navigate :read-books
-    :fx [[:dispatch [::get-read-books]]]}))
-
-(re-frame/reg-event-fx                  
- ::bad-login-response
- (fn [_ [_ {{errorCode :errorCode} :response}]]
-   {:login-error-alert errorCode}))
-
-(re-frame/reg-fx
- :login-error-alert
- (fn [error-code]
-   (case error-code
-     "INVALID_DATA_FORMAT" (js/alert "Username or password format is wrong")
-     (js/alert "Something went wrong with the server"))))
-
 (defn claims [base64]
   (-> base64
       (str/split ".")
@@ -46,6 +14,42 @@
       b64/decodeString
       (#(.parse js/JSON %))
       (js->clj :keywordize-keys true)))
+      
+(re-frame/reg-event-fx
+ ::add-book-alert
+ (fn [{{token :token} :db} [_ bookname num-pages year month]]
+   (println (:id (claims token)))
+   (js/alert (str bookname num-pages year month))))
+
+(re-frame/reg-event-fx
+ ::add-book
+ (fn
+   [{{token :token} :db} [_ bookname num-pages year month]]
+   {:http-xhrio {:method          :post
+                 :uri             (str config/url "/users/" (:id (claims token)) "/books")
+                 :headers         {"Authorization" (str "Bearer " token)}
+                 :params          {:bookname bookname :num-pages num-pages :year year :month month}
+                 :format          (ajax/json-request-format)
+                 :response-format (ajax/json-response-format {:keywords? true}) 
+                 :on-success      [::process-add-book-response]
+                 :on-failure      [::bad-add-book-response]
+                 }
+    }))
+
+(re-frame/reg-event-fx
+ ::process-add-book-response
+ (fn [_]
+   {:fx [[:dispatch [::get-read-books]]]}))
+
+(re-frame/reg-event-fx                  
+ ::bad-add-book-response
+ (fn [_ [_ {{errorCode :errorCode} :response}]]
+   {:add-book-error-alert errorCode}))
+
+(re-frame/reg-fx
+ :add-book-error-alert
+ (fn [error-code]
+     (js/alert "Something went wrong with the server")))
 
 (re-frame/reg-event-fx
  ::get-read-books
@@ -66,7 +70,7 @@
  (fn [{db :db} [_ {books :books}]]
    {:db (assoc db :read-books books)}))
 
-(re-frame/reg-event-fx
+(re-frame/reg-event-fx                  
  ::bad-get-read-books-response
  (fn [_ [_ {{errorCode :errorCode} :response}]]
    {:get-read-books-error-alert errorCode}))

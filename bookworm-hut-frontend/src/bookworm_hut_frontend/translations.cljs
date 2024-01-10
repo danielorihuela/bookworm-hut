@@ -17,7 +17,15 @@
      :username-error-hint "Minimum length is 3"
      :password-hint "Password"
      :password-error-hint "Minimum length is 8"
-     :submit "Login"}}
+     :submit "Login"}
+    :read-books
+    {:add "Add book"
+     :bookname-hint "Book name"
+     :bookname-error-hint "Book name cannot be empty"
+     :num-pages-hint "Number of pages"
+     :num-pages-error-hint "Number of pages must be greater than 0"
+     :month-hint "Read on month"
+     :year-hint "Read on year"}}
    :es-ES
    {:register
     {:title "Registrarse"
@@ -32,8 +40,15 @@
      :username-error-hint "Longitud mínima es 3"
      :password-hint "Contraseña"
      :password-error-hint "Longitud mínima es 8"
-     :submit "Acceder"}}
-   })
+     :submit "Acceder"}
+    :read-books
+    {:add "Añadir libro"
+     :bookname-hint "Título"
+     :bookname-error-hint "Título no puede estar vacío"
+     :num-pages-hint "Número de páginas"
+     :num-pages-error-hint "Número de páginas debe ser mayor a 0"
+     :month-hint "Leído el mes"
+     :year-hint "Leído el año"}}})
 
 (defn tr [locale keys]
   (reduce #(%1 %2)
