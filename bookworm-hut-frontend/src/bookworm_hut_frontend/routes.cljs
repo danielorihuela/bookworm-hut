@@ -8,7 +8,8 @@
   ["/" {""      :home
         "register" :register
         "login" :login
-        "read-books" :read-books}])
+        "read-books" :read-books
+        "stats" :stats}])
 
 (defn dispatch [route]
   (re-frame/dispatch [::events/set-active-panel route]))

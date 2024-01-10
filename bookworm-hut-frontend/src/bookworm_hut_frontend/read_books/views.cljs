@@ -97,8 +97,7 @@
          [:th (tr/tr @locale '(:read-books :bookname-hint))]
          [:th (tr/tr @locale '(:read-books :num-pages-hint))]
          [:th (tr/tr @locale '(:read-books :year-hint))]
-         [:th (tr/tr @locale '(:read-books :month-hint))]
-        ]]
+         [:th (tr/tr @locale '(:read-books :month-hint))]]]
        [:tbody
         (for [book @books]
           (let [name (:bookname book)
@@ -109,6 +108,4 @@
            [:td name]
            [:td num-pages]
            [:td year]
-           [:td month]]))
-        ]
-       ])))
+           [:td month]]))]])))

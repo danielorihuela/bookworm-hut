@@ -25,7 +25,10 @@
      :num-pages-hint "Number of pages"
      :num-pages-error-hint "Number of pages must be greater than 0"
      :month-hint "Read on month"
-     :year-hint "Read on year"}}
+     :year-hint "Read on year"}
+    :heading
+    {:read-books "Read books"
+     :stats "Stats"}}
    :es-ES
    {:register
     {:title "Registrarse"
@@ -48,7 +51,10 @@
      :num-pages-hint "Número de páginas"
      :num-pages-error-hint "Número de páginas debe ser mayor a 0"
      :month-hint "Leído el mes"
-     :year-hint "Leído el año"}}})
+     :year-hint "Leído el año"}
+    :heading
+    {:read-books "Libros leídos"
+     :stats "Estadísticas"}}})
 
 (defn tr [locale keys]
   (reduce #(%1 %2)
