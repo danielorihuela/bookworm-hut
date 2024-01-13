@@ -135,11 +135,25 @@
               :error "Something went wrong"}
        :headers {"Content-type" "application/json"} })))
 
+(defn delete-book
+  [username bookname]
+  (try
+    (let [raw-books (books-repository/delete-read-book username bookname)]
+      {:status 200
+       :body {}
+       :headers {"Content-type" "application/json"}})
+    (catch Exception e
+      {:status 500
+       :body {:errorCode "UNKNOWN_ERROR"
+              :error "Something went wrong"}
+       :headers {"Content-type" "application/json"} })))
+
 (defroutes all-routes
   (POST "/register" {{username :username password :password} :body} (register username password))
   (POST "/login" {{username :username password :password} :body} (login username password))
   (POST "/users/:id/books" {{id :id} :params {bookname :bookname num-pages :num-pages year :year month :month} :body} (add-book id bookname num-pages year month))
   (GET "/users/:id/books" {{id :id} :params} (get-books id))
+  (DELETE "/users/:id/books/:bookname" {{id :id bookname :bookname} :params} (delete-book id bookname))
   (route/not-found "<h1>Page not found</h1>"))
 
 (def access-rules [{:pattern #"/register"
@@ -169,13 +183,13 @@
       (wrap-access-rules {:rules access-rules :on-error on-error})
       (wrap-authentication backend)
       (json/wrap-json-body {:keywords? true})
-      ;;wrap-print-request
       keyword-params/wrap-keyword-params
       params/wrap-params
       json/wrap-json-response
+      ;;wrap-print-request
       (cors/wrap-cors
        :access-control-allow-origin [#"http://localhost:8280"]
-       :access-control-allow-methods [:get :post])
+       :access-control-allow-methods [:get :post :delete])
       ))
 
 (defn start-server []

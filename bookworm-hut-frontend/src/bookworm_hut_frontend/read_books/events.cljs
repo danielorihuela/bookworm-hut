@@ -14,12 +14,6 @@
       b64/decodeString
       (#(.parse js/JSON %))
       (js->clj :keywordize-keys true)))
-      
-(re-frame/reg-event-fx
- ::add-book-alert
- (fn [{{token :token} :db} [_ bookname num-pages year month]]
-   (println (:id (claims token)))
-   (js/alert (str bookname num-pages year month))))
 
 (re-frame/reg-event-fx
  ::add-book
@@ -77,5 +71,34 @@
 
 (re-frame/reg-fx
  :get-read-books-error-alert
+ (fn [error-code]
+     (js/alert "Something went wrong with the server")))
+
+(re-frame/reg-event-fx
+ ::delete-book
+ (fn
+   [{{token :token} :db} [_ bookname]]
+   {:http-xhrio {:method          :delete
+                 :uri             (str config/url "/users/" (:id (claims token)) "/books/" bookname)
+                 :headers         {"Authorization" (str "Bearer " token)}
+                 :format          (ajax/json-request-format)
+                 :response-format (ajax/json-response-format {:keywords? true}) 
+                 :on-success      [::process-delete-book-response]
+                 :on-failure      [::bad-delete-book-response]
+                 }
+    }))
+
+(re-frame/reg-event-fx
+ ::process-delete-book-response
+ (fn [_]
+   {:fx [[:dispatch [::get-read-books]]]}))
+
+(re-frame/reg-event-fx                  
+ ::bad-delete-book-response
+ (fn [_ [_ {{errorCode :errorCode} :response}]]
+   {:delete-book-error-alert errorCode}))
+
+(re-frame/reg-fx
+ :delete-book-error-alert
  (fn [error-code]
      (js/alert "Something went wrong with the server")))

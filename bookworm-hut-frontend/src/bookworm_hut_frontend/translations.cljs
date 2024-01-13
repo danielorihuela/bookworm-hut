@@ -25,7 +25,8 @@
      :num-pages-hint "Number of pages"
      :num-pages-error-hint "Number of pages must be greater than 0"
      :month-hint "Read on month"
-     :year-hint "Read on year"}
+     :year-hint "Read on year"
+     :delete "Delete"}
     :stats
     {:per-month "Pages read per month"
      :per-year "Pages read per year"}
@@ -54,7 +55,8 @@
      :num-pages-hint "Número de páginas"
      :num-pages-error-hint "Número de páginas debe ser mayor a 0"
      :month-hint "Leído el mes"
-     :year-hint "Leído el año"}
+     :year-hint "Leído el año"
+     :delete "Borrar"}
     :stats
     {:per-month "Páginas leídas por mes"
      :per-year "Páginas leídas por año"}

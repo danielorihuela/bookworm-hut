@@ -22,3 +22,13 @@
   (jdbc/execute!
    db-config/db
    (sql/format (get-read-books-query username))))
+
+
+(defn delete-read-book-query [username bookname]
+  {:delete-from [:books]
+   :where [:and [:= :username username] [:= :bookname bookname]]})
+
+(defn delete-read-book [username bookname]
+  (jdbc/execute!
+   db-config/db
+   (sql/format (delete-read-book-query username bookname))))
