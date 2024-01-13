@@ -1,11 +1,14 @@
 (ns bookworm-hut-frontend.views
   (:require
    [re-frame.core :as re-frame]
+   [reagent.core :as reagent]
    [bookworm-hut-frontend.subs :as subs]
    [bookworm-hut-frontend.events :as events]
    [bookworm-hut-frontend.register.views]
    [bookworm-hut-frontend.login.views]
    [bookworm-hut-frontend.read-books.views]
+   [bookworm-hut-frontend.components.months-chart.views :refer [months-chart]]
+   [bookworm-hut-frontend.components.years-chart.views :refer [years-chart]]
    [bookworm-hut-frontend.routes :as routes]
    [bookworm-hut-frontend.translations :as tr]))
 
@@ -65,20 +68,25 @@
       (tr/tr @locale '(:heading :stats))]]))
 
 (defn read-books-panel []
-  (let [locale (re-frame/subscribe [::subs/locale])]
-    [:div {:style (conj {:height "100vh" :gap "2em"} (flex-col-center-h))}
-     [:div {:style {:display "flex" :align-items "center" :margin-top "2em"}}
-     [heading]]
-     [:div {:style {:display "flex" :align-items "center"}}
-      [bookworm-hut-frontend.read-books.views/add-book-form]]
-     [:div {:style {:overflow "auto" :margin-bottom "2em"}}
-      [bookworm-hut-frontend.read-books.views/read-books-table]]]))
+  (let [locale (re-frame/subscribe [::subs/locale])
+        read-books (re-frame/subscribe [::subs/read-books])]
+      [:div {:style (conj {:height "100vh" :gap "2em"} (flex-col-center-h))}
+       [:div {:style {:display "flex" :align-items "center" :margin-top "2em"}}
+        [heading]]
+       [:div {:style {:display "flex" :align-items "center"}}
+        [bookworm-hut-frontend.read-books.views/add-book-form]]
+       [:div {:style {:overflow "auto" :margin-bottom "2em"}}
+        [bookworm-hut-frontend.read-books.views/read-books-table]]]))
 
 (defn stats-panel []
-  (let [locale (re-frame/subscribe [::subs/locale])]
+  (let [read-books (re-frame/subscribe [::subs/read-books])]
     [:div {:style (conj {:height "100vh" :gap "2em"} (flex-col-center-h))}
      [:div {:style {:display "flex" :align-items "center" :margin-top "2em"}}
-     [heading]]]))
+      [heading]]
+      [:div
+       [months-chart "800" "300" @read-books]]
+      [:div
+       [years-chart "800" "300" @read-books]]]))
 
 (defn panels [panel]
   (case panel

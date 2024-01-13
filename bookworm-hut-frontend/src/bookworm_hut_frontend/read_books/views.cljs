@@ -104,7 +104,7 @@
                 num-pages (:num-pages book)
                 year (:year book)
                 month (:month book)]
-          [:tr
+          [:tr {:key (str book)}
            [:td name]
            [:td num-pages]
            [:td year]
